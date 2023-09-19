@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--Mapperとxmlのマッピング -->
+<mapper
+	namespace="com.Example.demothimeleaf.repository.UserMapper">
+
+
+	<!--マッピング定義 -->
+	<!--resultMapとは戻り値を一元管理できるタグ resultTypeで定義する必要がない。戻り値として必要なのはselect文のみ resultMapでどのエンティティを見るか定義 
+		idは任意の値を入力してresultMapタグに紐づける id colum=主キーのカラム　result column=その他のカラム property=エンティティのどのフィールドなのか -->
+	<resultMap
+		type="com.Example.demothimeleaf.domain.user.model.MUser" id="user">
+		<id column="user_id" property="userId" />
+		<result column="password" property="password" />
+		<result column="user_name" property="userName" />
+		<result column="birthday" property="birthday" />
+		<result column="age" property="age" />
+		<result column="gender" property="gender" />
+		<result column="department_id" property="departmentId" />
+		<result column="role" property="role" />
+	</resultMap>
+
+	<!--ユーザー登録 -->
+	<!--id=mapper.javaのメソッド名 -->
+	<!--insert文はデータ入れるだけなので戻り値無し -->
+	<insert id="insertOne">
+		insert into m_user(
+		user_id
+		,password
+		,user_name
+		,birthday
+		,age
+		,gender
+		,department_id
+		,role
+		)values(
+		#{userId}
+		,#{password}
+		,#{userName}
+		,#{birthday}
+		,#{age}
+		,#{gender}
+		,#{departmentId}
+		,#{role}
+		)
+	</insert>
+
+	<!--ユーザー全件表示 -->
+	<!--id=mapper.javaのメソッド名 resultType=このクエリの戻り値 -->
+	<select id="findMany" resultType="MUser">
+		select * from m_user
+		<where>
+			<if test="userId !=null">
+				user_id like '%'||#{userId}||'%'
+			</if>
+			<if test="userName !=null">
+				and user_name like '%'||(#{userName})||'%'
+			</if>			
+		</where>
+	</select>
+
+	<!--ユーザー1件表示 -->
+	<!--id=mapper.javaのメソッド名 resultMap=上述で定義したresultMapのidがここで紐づいている。 -->
+	<select id="findOne" resultMap="user">
+		select * from m_user where
+		user_id=#{userId}
+	</select>
+
+	<!--ユーザー1件更新 -->
+	<!--mapper.javaで定義した@param(フィールド名)引数とカラム名とを紐付ける -->
+	<!--クラス変数を引数にすることもできる。※後述 -->
+	<update id="updateOne">
+		update
+		m_user
+		set
+		password=#{password},
+		user_name=#{userName}
+		where
+		user_id=#{userId}
+	</update>
+
+	<!--Mapper.javaでMuserが引数とした場合 <update id="updateOne"> update m_user set 
+		password=#{user.password}, user_name=#{user.userName} where user_id=#{user.userId} 
+		※userがparamなのでuserのpasswordというような形。 その他のフィールドも同上 </update> -->
+
+	<!--ユーザー1件削除  -->
+	<delete id="deleteOne">
+		delete from
+		m_user
+		where
+		user_id=#{userId}
+	</delete>
+</mapper>
